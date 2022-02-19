@@ -10,6 +10,43 @@
 <body>
 
 	<div id="sudokuDiv"></div>
+	<div id="buttons">
+		
+		<form>
+
+			<div id="mode">
+
+				<input type="radio" id="note" value="note" name="type">
+				<label for="note">Note</label>
+				<input type="radio" id="normal" value="normal" name="type" checked>
+				<label for="normal">Normal</label>
+			
+			</div>
+
+			<div>
+				
+				<input type="button" class="button" value="1" onclick="insert(value)" />
+				<input type="button" class="button" value="2" onclick="insert(value)" />
+				<input type="button" class="button" value="3" onclick="insert(value)" />
+				<input type="button" class="button" value="4" onclick="insert(value)" />
+				<input type="button" class="button" value="5" onclick="insert(value)" />
+				<input type="button" class="button" value="6" onclick="insert(value)" />
+				<input type="button" class="button" value="7" onclick="insert(value)" />
+				<input type="button" class="button" value="8" onclick="insert(value)" />
+				<input type="button" class="button" value="9" onclick="insert(value)" />
+
+			</div>
+
+			<div>
+				
+				<p>This button will be useless in a normal game, it will delete All the numbers, also the given ones.</p>
+				<input type="button" class="resetButton" value="Reset all cells" onclick="resetAllCells()" />
+
+			</div>
+			
+		</form>
+
+	</div>
 
 </body>
 </html>

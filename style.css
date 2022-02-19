@@ -1,3 +1,7 @@
+body{
+	font-family: Arial;
+}
+
 table{
 
 	margin: auto;
@@ -11,6 +15,21 @@ td{
 	height: 60px;
 	width: 60px;
 	text-align: center;
+	font-size: 22px;
+}
+
+.button{
+
+	width: 30px;
+	height: 30px;
+	font-size: 17px;
+}
+
+.resetButton{
+
+	background-color: red;
+	font-size: 17px;
+	height: 30px;
 }
 
 .right{
@@ -31,4 +50,11 @@ td{
 .bottom{
 
 	border-bottom: 3px solid black;
+}
+
+.small{
+	
+	font-size: 12px;
+	text-align: right;
+	vertical-align: top;
 }
