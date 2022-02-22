@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", (event)=>{
 				td += " bottom "
 			}
 
-			td += "' id=" + id + " onclick='adjournCurrentCell(id)' >" + (j + 1) + "</td>"
+			td += "' id=" + id + " onclick='adjournCurrentCell(id)' ></td>"
 			string += td
 		}
 		string += "</tr>"
@@ -44,20 +44,22 @@ document.addEventListener("DOMContentLoaded", (event)=>{
 function fillCells(array=[]){
 
 	//TEMP IMPLEMENTATION FOR TEST PURPOSES
-	let arr = [1,2,3,1,2,3,1,2,3]
-	let arr2 = [4,5,6,4,5,6,4,5,6]
-	let arr3 = [7,8,9,7,8,9,7,8,9]
+	//let arr = [1,2,3,1,2,3,1,2,3]
+	//let arr2 = [4,5,6,4,5,6,4,5,6]
+	//let arr3 = [7,8,9,7,8,9,7,8,9]
 
-	let total = [arr, arr2, arr3, arr, arr2, arr3, arr, arr2, arr3]
+	//let total = [arr, arr2, arr3, arr, arr2, arr3, arr, arr2, arr3]
 
 	//console.log(total)
 
+	/*
 	for(let i = 0; i < 9; i++){
 		for(let j = 0; j < 9; j++){
 
 			document.getElementById(i * 9 + j).innerHTML = total[i][j]
 		}
 	}
+	*/
 }
 
 function createSudoku(){}
@@ -176,8 +178,14 @@ function adjournCurrentCell(id){
 	let col = currentCell % 9
 
 	let startingRow = Math.floor(currentCell / 27) * 3
-	let startingCol = Math.floor((currentCell % 9) / 3) * 3		
+	let startingCol = Math.floor((currentCell % 9) / 3) * 3
 
+	for(let i = 0; i < 81; i++){
+
+		document.getElementById(i).style.backgroundColor = "#fff"
+	}	
+
+	/*console.log("currentCell fatto")
 	document.getElementById(currentCell).style.backgroundColor = "#fff"
 
 	for(let i = 0; i < 9; i++){
@@ -186,6 +194,8 @@ function adjournCurrentCell(id){
 		document.getElementById(row * 9 + i).style.backgroundColor = "#fff"
 		document.getElementById(i * 9 + col).style.backgroundColor = "#fff"
 	}
+
+	console.log("Righe e colonne")
 	
 	for(let i = 0; i < 3; i++){
 		for(let j = 0; j < 3; j++){
@@ -195,9 +205,14 @@ function adjournCurrentCell(id){
 		}
 	}	
 
+	console.log("Quadrati")*/
+
 	currentCell = id;
 	row = Math.floor(currentCell / 9)
 	col = currentCell % 9
+	
+
+
 	for(let i = 0; i < 9; i++){
 
 		document.getElementById(row * 9 + i).style.backgroundColor = "rgba(171, 205, 239, 0.4)"
@@ -261,3 +276,76 @@ function resetAllCells(){
 		document.getElementById(i).innerHTML = ""
 	}
 }
+
+document.addEventListener('keydown', (event)=>{
+
+	if(event.keyCode == '37'){
+		//arrow left
+		if(currentCell > 0){
+
+			currentCell --
+			adjournCurrentCell(currentCell)
+		}
+	}
+	if(event.keyCode == '38'){
+		//arrow up
+		if(currentCell > 8){
+
+			currentCell -= 9
+			adjournCurrentCell(currentCell)
+		}
+	}
+	if(event.keyCode == '39'){
+		//arrow right
+		if(currentCell < 80){
+
+			currentCell ++
+			adjournCurrentCell(currentCell)
+		}
+	}
+	if(event.keyCode == '40'){
+		//arrow down
+		if(currentCell < 72){
+
+			currentCell += 9
+			adjournCurrentCell(currentCell)
+		}
+	}
+	if(event.keyCode == '49' || event.keyCode == '97'){
+		//1
+		insert(1)
+	}
+	if(event.keyCode == '50' || event.keyCode == '98'){
+		//2
+		insert(2)
+	}
+	if(event.keyCode == '51' || event.keyCode == '99'){
+		//2
+		insert(3)
+	}
+	if(event.keyCode == '52' || event.keyCode == '100'){
+		//2
+		insert(4)
+	}
+	if(event.keyCode == '53' || event.keyCode == '101'){
+		//2
+		insert(5)
+	}
+	if(event.keyCode == '54' || event.keyCode == '102'){
+		//2
+		insert(6)
+	}
+	if(event.keyCode == '55' || event.keyCode == '103'){
+		//2
+		insert(7)
+	}
+	if(event.keyCode == '56' || event.keyCode == '104'){
+		//2
+		insert(8)
+	}
+	if(event.keyCode == '57' || event.keyCode == '105'){
+		//2
+		insert(9)
+	}
+
+})
