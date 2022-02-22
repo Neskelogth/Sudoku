@@ -8,6 +8,8 @@
 	
 </head>
 <body>
+	
+	<h1>Sudoku</h1>
 
 	<div id="sudokuDiv"></div>
 	<div id="buttons">
@@ -34,6 +36,15 @@
 				<input type="button" class="button" value="7" onclick="insert(value)" />
 				<input type="button" class="button" value="8" onclick="insert(value)" />
 				<input type="button" class="button" value="9" onclick="insert(value)" />
+
+			</div>
+
+			<br />
+			
+			<div id="buttons">
+
+				<input type="button" value="Check Sudoku" onclick="checkSudoku()"/>
+				<input type="button" value="Delete number" onclick="deleteCell()" />
 
 			</div>
 
