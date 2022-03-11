@@ -5,11 +5,25 @@
 	<title>Sudoku</title>
 	<script type="text/javascript" src="script.js"></script>
 	<link rel="stylesheet" href="style.css"></link>
+	<meta charset="utf-8" />
 	
 </head>
 <body>
 
 	<h1>Sudoku</h1>
+
+	<div id="difficulty" onchange="selectDifficulty()">
+		
+		<label for="diff">Select difficulty</label>
+		<select id="diff">
+			
+			<option value="0">Easy</option>
+			<option value="1">Medium</option>
+			<option value="2">Difficult</option>
+
+		</select>
+
+	</div>
 
 	<div id="sudokuDiv"></div>
 	<div id="buttons">
@@ -49,13 +63,6 @@
 
 			</div>
 
-			<div>
-				
-				<p>This button will be useless in a normal game, it will delete All the numbers, also the given ones.</p>
-				<input type="button" class="resetButton" value="Reset all cells" onclick="resetAllCells()" />
-
-			</div>
-			
 		</form>
 
 	</div>

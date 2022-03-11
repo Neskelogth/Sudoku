@@ -1,7 +1,14 @@
-let currentCell = 0;
+/**
+	I don't like global variables, but I think in this case simplifies some things
+*/
+let currentCell = 0
+let difficulty = 0
+let puzzle = []
+let maskedPuzzle = []
 
 document.addEventListener("DOMContentLoaded", (event)=>{
 
+	//building the table 
 	let string = "<table>"
 
 	for(let i = 0; i < 9; i++){
@@ -13,22 +20,22 @@ document.addEventListener("DOMContentLoaded", (event)=>{
 			
 			if(j == 2 || j == 5 || j == 8){
 
-				td += " right "
+				td += " right"
 			}
 			if(j == 0){
 
-				td += " left "
+				td += " left"
 			}
 			if(i == 0){
 
-				td += " top "
+				td += " top"
 			}
 			if(i == 2 || i == 5 || i == 8){
 
-				td += " bottom "
+				td += " bottom"
 			}
 
-			td += "' id=" + id + " onclick='adjournCurrentCell(id)' ></td>"
+			td += "' id=" + id + " onclick='updateCurrentCell(id)' ></td>"
 			string += td
 		}
 		string += "</tr>"
@@ -37,42 +44,45 @@ document.addEventListener("DOMContentLoaded", (event)=>{
 	string += "</table>"
 
 	document.getElementById("sudokuDiv").innerHTML = string
-	adjournCurrentCell(0)
+	updateCurrentCell(0)
 	fillCells()
 })
 
+/**
+	insertion, movement and deleting with keyboard
+*/
 document.addEventListener('keydown', (event)=>{
 
+	//arrow left
 	if(event.keyCode == '37'){
-		//arrow left
 		if(currentCell > 0){
 
 			currentCell --
-			adjournCurrentCell(currentCell)
+			updateCurrentCell(currentCell)
 		}
 	}
+	//arrow up
 	if(event.keyCode == '38'){
-		//arrow up
 		if(currentCell > 8){
 
 			currentCell -= 9
-			adjournCurrentCell(currentCell)
+			updateCurrentCell(currentCell)
 		}
 	}
+	//arrow right
 	if(event.keyCode == '39'){
-		//arrow right
 		if(currentCell < 80){
 
 			currentCell ++
-			adjournCurrentCell(currentCell)
+			updateCurrentCell(currentCell)
 		}
 	}
+	//arrow down
 	if(event.keyCode == '40'){
-		//arrow down
 		if(currentCell < 72){
 
 			currentCell += 9
-			adjournCurrentCell(currentCell)
+			updateCurrentCell(currentCell)
 		}
 	}
 	if(event.keyCode == '49' || event.keyCode == '97'){
@@ -117,6 +127,9 @@ document.addEventListener('keydown', (event)=>{
 	}
 })
 
+/**
+	Temporary implementations, just fills the cells as they are needed for my tests
+*/
 function fillCells(array=[]){
 
 	//Temporary implementation
@@ -140,6 +153,31 @@ function fillCells(array=[]){
 	}
 }
 
+
+/**
+	Inserts newly find numbers in solving process
+*/
+function fillNewCells(domains) {
+	
+	domains.forEach((domain, i) => {
+
+		//console.log(i)
+		if(Array.isArray(domain) && domain.length == 1){
+
+			domains[i] = domain[0]
+			domains = clearRows(domains)
+			domains = clearCols(domains)
+			domains = clearSquares(domains)
+			document.getElementById(i).innerHTML = domain[0]
+		}
+	})
+
+	return domains
+}
+
+/**
+	remove element from array by value
+*/
 function removeByValue(arr, value){
 
 	if(!Array.isArray(arr)){
@@ -157,190 +195,207 @@ function removeByValue(arr, value){
 	return arr
 }
 
-function removeFromRow(domains, value, index){
 
-	if(index > 80 || index < 0){
-
-		alert("something went wrong")
-		return domains
-	}
-
-	let row = Math.floor(index / 9)
-	
-	for(let i = 0; i < 9; i++){
-
-		//console.log(domains[i])
-		let auxIndex = row * 9 + i
-		if(Array.isArray(domains[auxIndex]) && (auxIndex != index)){
-
-			domains[auxIndex] = removeByValue(domains[i], value)
-		}
-	}
-
-	return domains
-}
-
-function removeFromCol(domains, value, index){
-
-	if(index > 80 || index < 0){
-
-		alert("something went wrong")
-		return domains
-	}
-
-	let col = index % 9
-	
-	for(let i = 0; i < 9; i++){
-
-		let auxIndex = i * 9 + col
-		if(Array.isArray(domains[auxIndex]) && (auxIndex != index)){
-
-			domains[auxIndex] = removeByValue(domains[i], value)
-		}
-	}
-
-	return domains
-}
-function removeFromSquare(domains, value, index){
-
-	return domains
-}
-
-function restrictDomains(domains){
-}
-
+/**
+	Checks if domains of possible values of cells are 
+	single value or have multiple values. Single values are not
+	stored in arrays
+*/
 function allSingleDomains(domains){
 
 	for(let i = 0; i < 81; i++){
-		if(!Array.isArray(domains[i])){
+		if(Array.isArray(domains[i])){
 
 			return false
 		}
 	}
 }
 
+/**
+	Removes all the impossible values (for the row rule) from the row
+*/
+function clearRows(domains){
+
+	
+	for(let row = 0; row < 9; row++){
+
+		let singleValues = []
+		for (let i = 0; i < 9; i++){
+
+			let id = i + row * 9
+			if(document.getElementById(id).innerHTML != ""){
+
+				singleValues.push(parseInt(document.getElementById(id).innerHTML))
+			}
+		}
+
+		for(let i = 0; i < 9; i++){
+
+			let id = row * 9 + i
+			let currentCellDomain = domains[id]
+
+			if(Array.isArray(currentCellDomain)){
+
+				singleValues.forEach((element) =>{
+
+					domains[id] = removeByValue(currentCellDomain, element)
+				})
+			}
+		}
+	}
+	
+	//console.log(domains)
+	return domains
+}
+
+/**
+	Removes all the impossible values (for the column rule) from the column
+*/
+function clearCols(domains){
+
+	for(let col = 0; col < 9; col++){
+
+		let singleValues = []
+		for (let i = 0; i < 9; i++){
+
+			let id = i * 9 + col
+			if(document.getElementById(id).innerHTML != ""){
+
+				singleValues.push(parseInt(document.getElementById(id).innerHTML))
+			}
+		}
+
+		for(let i = 0; i < 9; i++){
+
+			let id = i * 9 + col
+			let currentCellDomain = domains[id]
+
+			if(Array.isArray(currentCellDomain)){
+
+				singleValues.forEach((element) =>{
+
+					domains[id] = removeByValue(currentCellDomain, element)
+				})
+			}
+		}
+	}
+	return domains
+}
+
+/**
+	Removes all the impossible values (for the square rule) from the square
+*/
+function clearSquares(domains){
+
+	
+	for(let auxRow = 0; auxRow < 3; auxRow++){
+
+		for(let auxCol = 0; auxCol < 3; auxCol++){
+
+			let startingRow = auxRow * 3
+			let startingCol = auxCol * 3
+	
+			let singleValues = []
+
+			for(let i = 0; i < 3; i++){
+				for(let j = 0; j < 3; j++){
+
+					let currentId = (startingRow + i) * 9 + startingCol + j
+					if(document.getElementById(currentId).innerHTML != ""){
+
+						singleValues.push(parseInt(document.getElementById(currentId).innerHTML))
+					}
+				}
+			}
+
+			for(let i = 0; i < 3; i++){
+				for(let j = 0; j < 3; j++){
+
+					let id = (startingRow + i) * 9 + startingCol + j
+					let currentCellDomain = domains[id]
+
+					if(Array.isArray(currentCellDomain)){
+
+						singleValues.forEach((element) =>{
+
+							domains[id] = removeByValue(currentCellDomain, element)
+						})
+					}
+				}
+			}
+		}
+	}
+	return domains
+}
+
+/**
+	Work in progress, should solve the sudoku
+*/
 function solve(){
 
-	alert("Still not working")
-	domains = [
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9],
-					[1,2,3,4,5,6,7,8,9]
-			  ]
+	//Represent all possible values of all cells
+	//Already given cells have only one value, all the others 
+	//start at all values between 1 and 9. Domains will be 
+	//restricted later
+	let domains = []
+	let counter = 3
 
-	let values = []
 	for(let i = 0; i < 81; i++){
 
-		let n = document.getElementById(i).innerHTML;
-		console.log(n)
-		if(n != ""){
-			console.log("id " + i)
-			domains[i] = parseInt(n)
-		}		
+		let n = parseInt(document.getElementById(i).innerHTML)
+		if(!isNaN(n)){
+
+			domains.push(n)
+		}else{
+		
+			domains.push([1, 2, 3, 4, 5, 6, 7, 8, 9])
+		}
 	}
 
+	
 
-	//console.log(values)
-	//console.log(domains)
-	let maxN = 10
-	removeFromRow(domains, 5, 3)
-	removeFromCol(domains, 5, 3)
+	while(!allSingleDomains(domains) && counter > 0){	
 
-	//console.log(domains)
+		domains = clearRows(domains)
+		domains = clearCols(domains)
+		domains = clearSquares(domains)
 
-	/*while(!allSingleDomains(domains) && (maxN > 0)){
+		domains = fillNewCells(domains)
+		
+		counter --
+	}
 
-		restrictDomains(domains)
-		maxN--
-	}*/
+	console.log(counter)
+
+	/*
+	
+	if(!allSingleDomains(domains)){
+	
+		alert("Could not resolve the sudoku, are you sure the ")
+	}
+
+	*/
+
+	console.log(domains)
 
 }
 
+
+//TODO
 function createSudoku(){}
 
+/**
+	Checks if all elements in an array are different or not
+*/
 function allDiff(array){
 
 	return (new Set(array)).size === array.length;
 }
 
+/**
+	Checks if the column is fully compiled, with the right number 
+	and if there are repetition
+*/
 function checkColumns(){
 
 	for(let i = 0; i < 9; i++){
@@ -370,6 +425,10 @@ function checkColumns(){
 	return true;
 }
 
+/**
+	Checks if the row is fully compiled, with the right number 
+	and if there are repetition
+*/
 function checkRows(){
 
 	for(let i = 0; i < 9; i++){
@@ -399,6 +458,10 @@ function checkRows(){
 	return true;
 }
 
+/**
+	Checks if the square is fully compiled, with the right number 
+	and if there are repetition
+*/
 function checkSquares(){
 
 	for(let i = 0; i < 9; i++){
@@ -428,11 +491,9 @@ function checkSquares(){
 	return true;
 }
 
-function deleteCell(){
-
-	document.getElementById(currentCell).innerHTML = ""
-}
-
+/**
+	Checks if the sudoku is correct
+*/
 function checkSudoku(){
 
 	if(checkColumns() && checkRows() && checkSquares()){
@@ -444,34 +505,44 @@ function checkSudoku(){
 	}
 }
 
-function adjournCurrentCell(id){
+/**
+	Deletes the content of a cell
+*/
+function deleteCell(){
 
+	document.getElementById(currentCell).innerHTML = ""
+}
+
+
+/**
+	updates the current Cell global variable and colors the background of 
+	the current row, column and square
+*/
+function updateCurrentCell(id){
+
+	//remove background color from all cells
+	for(let i = 0; i < 81; i++){
+
+		document.getElementById(i).style.backgroundColor = "rgb(255, 255, 255)"
+	}
+
+	//update cell and compute current row and col
+	currentCell = id;
 	let row = Math.floor(currentCell / 9)
 	let col = currentCell % 9
 
-	let startingRow = Math.floor(currentCell / 27) * 3
-	let startingCol = Math.floor((currentCell % 9) / 3) * 3
-
-	for(let i = 0; i < 81; i++){
-
-		document.getElementById(i).style.backgroundColor = "#fff"
-	}
-
-	currentCell = id;
-	row = Math.floor(currentCell / 9)
-	col = currentCell % 9
-	
-
-
+	//add background color in row and col
 	for(let i = 0; i < 9; i++){
 
 		document.getElementById(row * 9 + i).style.backgroundColor = "rgba(171, 205, 239, 0.4)"
 		document.getElementById(i * 9 + col).style.backgroundColor = "rgba(171, 205, 239, 0.4)"
 	}
 
-	startingCol = Math.floor((currentCell % 9) / 3) * 3
-	startingRow = Math.floor(currentCell / 27) * 3
+	//aux Indexes for square background
+	let startingCol = Math.floor((currentCell % 9) / 3) * 3
+	let startingRow = Math.floor(currentCell / 27) * 3
 
+	//add background to square
 	for(let i = 0; i < 3; i++){
 		for(let j = 0; j < 3; j++){
 
@@ -480,9 +551,13 @@ function adjournCurrentCell(id){
 		}
 	}
 	
+	//highlight current cell
 	document.getElementById(currentCell).style.backgroundColor = "rgb(171, 205, 239)";
 }
 
+/**
+	Decides if we have to insert a note or a number
+*/
 function insert(value){
 
 	if(document.getElementsByTagName("input")[1].checked){
@@ -492,6 +567,9 @@ function insert(value){
 	}
 }
 
+/**
+	Inserts a number normal
+*/
 function insertNumber(value){
 
 	if(!isNaN(value)){
@@ -501,10 +579,14 @@ function insertNumber(value){
 	}
 }
 
+/**
+	Inserts/removes a small note on the
+*/
 function insertNote(value){
 	
 	let content = document.getElementById(currentCell).innerHTML
-	//console.log(content)
+
+	//TO FIX
 
 	if(content.indexOf(value) != -1){
 
@@ -518,12 +600,10 @@ function insertNote(value){
 	}
 }
 
-function resetAllCells(){
+/**
+	Just a setter of the global variable
+*/
+function selectDifficulty(){
 
-	console.clear()
-	for(let i = 0; i < 80; i++){
-
-		document.getElementById(i).innerHTML = ""
-	}
+	difficulty = document.getElementById("diff").value
 }
-
