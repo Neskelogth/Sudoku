@@ -3,8 +3,19 @@
 */
 let currentCell = 0
 let difficulty = 0
+//maskedPuzzle is temporary
+let maskedPuzzle = [
+				["", "", "", "5", "1", "", "", "3", ""],
+				["3", "9", "1", "6", "7", "", "5", "", "2"],
+				["6", "2", "", "8", "9", "", "4", "1", "7"],
+				["", "3", "2", "", "", "", "", "6", "4"],
+				["", "", "", "", "6", "", "2", "", "8"],
+				["8", "", "", "", "", "1", "", "", ""],
+				["2", "5", "", "", "3", "7", "", "", ""],
+				["", "1", "8", "", "", "6", "7", "", ""],
+				["", "", "", "", "2", "", "", "4", ""]]
+
 let puzzle = []
-let maskedPuzzle = []
 
 document.addEventListener("DOMContentLoaded", (event)=>{
 
@@ -128,27 +139,14 @@ document.addEventListener('keydown', (event)=>{
 })
 
 /**
-	Temporary implementations, just fills the cells as they are needed for my tests
+	Just fills the cells according to maskedPuzzle
 */
 function fillCells(array=[]){
 
-	//Temporary implementation
-	let total = [
-					["", "", "", "5", "1", "", "", "3", ""],
-					["3", "9", "1", "6", "7", "", "5", "", "2"],
-					["6", "2", "", "8", "9", "", "4", "1", "7"],
-					["", "3", "2", "", "", "", "", "6", "4"],
-					["", "", "", "", "6", "", "2", "", "8"],
-					["8", "", "", "", "", "1", "", "", ""],
-					["2", "5", "", "", "3", "7", "", "", ""],
-					["", "1", "8", "", "", "6", "7", "", ""],
-					["", "", "", "", "2", "", "", "4", ""]
-				]
-	
 	for(let i = 0; i < 9; i++){
 		for(let j = 0; j < 9; j++){
 
-			document.getElementById(i * 9 + j).innerHTML = total[i][j]
+			document.getElementById(i * 9 + j).innerHTML = maskedPuzzle[i][j]
 		}
 	}
 }
@@ -161,7 +159,6 @@ function fillNewCells(domains) {
 	
 	domains.forEach((domain, i) => {
 
-		//console.log(i)
 		if(Array.isArray(domain) && domain.length == 1){
 
 			domains[i] = domain[0]
@@ -209,6 +206,7 @@ function allSingleDomains(domains){
 			return false
 		}
 	}
+	return true
 }
 
 /**
@@ -222,10 +220,10 @@ function clearRows(domains){
 		let singleValues = []
 		for (let i = 0; i < 9; i++){
 
-			let id = i + row * 9
-			if(document.getElementById(id).innerHTML != ""){
+			let n = maskedPuzzle[row][i]
+			if(n != ""){
 
-				singleValues.push(parseInt(document.getElementById(id).innerHTML))
+				singleValues.push(parseInt(n))
 			}
 		}
 
@@ -258,10 +256,10 @@ function clearCols(domains){
 		let singleValues = []
 		for (let i = 0; i < 9; i++){
 
-			let id = i * 9 + col
-			if(document.getElementById(id).innerHTML != ""){
+			let n = maskedPuzzle[i][col]
+			if(n != ""){
 
-				singleValues.push(parseInt(document.getElementById(id).innerHTML))
+				singleValues.push(parseInt(n))
 			}
 		}
 
@@ -300,10 +298,10 @@ function clearSquares(domains){
 			for(let i = 0; i < 3; i++){
 				for(let j = 0; j < 3; j++){
 
-					let currentId = (startingRow + i) * 9 + startingCol + j
-					if(document.getElementById(currentId).innerHTML != ""){
+					let n = maskedPuzzle[startingRow + i][startingCol + j]
+					if(n != ""){
 
-						singleValues.push(parseInt(document.getElementById(currentId).innerHTML))
+						singleValues.push(parseInt(n))
 					}
 				}
 			}
@@ -342,7 +340,7 @@ function solve(){
 
 	for(let i = 0; i < 81; i++){
 
-		let n = parseInt(document.getElementById(i).innerHTML)
+		let n = parseInt(maskedPuzzle[Math.floor(i / 9)][i % 9])
 		if(!isNaN(n)){
 
 			domains.push(n)
@@ -352,20 +350,17 @@ function solve(){
 		}
 	}
 
-	
+	domains = clearRows(domains)
+	domains = clearCols(domains)
+	domains = clearSquares(domains)
 
 	while(!allSingleDomains(domains) && counter > 0){	
 
-		domains = clearRows(domains)
-		domains = clearCols(domains)
-		domains = clearSquares(domains)
-
 		domains = fillNewCells(domains)
-		
 		counter --
 	}
 
-	console.log(counter)
+	//console.log(counter)
 
 	/*
 	
