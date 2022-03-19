@@ -5,15 +5,15 @@ let currentCell = 0
 let difficulty = 0
 //maskedPuzzle is temporary
 let maskedPuzzle = [
-				["", "", "", "5", "1", "", "", "3", ""],
-				["3", "9", "1", "6", "7", "", "5", "", "2"],
-				["6", "2", "", "8", "9", "", "4", "1", "7"],
-				["", "3", "2", "", "", "", "", "6", "4"],
-				["", "", "", "", "6", "", "2", "", "8"],
-				["8", "", "", "", "", "1", "", "", ""],
-				["2", "5", "", "", "3", "7", "", "", ""],
-				["", "1", "8", "", "", "6", "7", "", ""],
-				["", "", "", "", "2", "", "", "4", ""]]
+				["6", "", "5", "7", "4", "", "", "", ""],
+				["7", "", "4", "6", "", "2", "", "5", "8"],
+				["2", "", "", "", "", "", "6", "7", ""],
+				["", "2", "", "4", "", "5", "7", "8", ""],
+				["", "", "", "", "", "", "5", "2", "6"],
+				["", "", "", "", "7", "6", "", "3", ""],
+				["5", "6", "8", "", "9", "", "", "4", ""],
+				["", "4", "", "", "6", "7", "", "9", "5"],
+				["", "9", "7", "5", "", "", "", "6", ""]]
 
 let puzzle = []
 
@@ -162,6 +162,7 @@ function fillNewCells(domains) {
 		if(Array.isArray(domain) && domain.length == 1){
 
 			domains[i] = domain[0]
+			maskedPuzzle[Math.floor(i / 9)][Math.floor(i % 9)] = domain[0].toString()
 			domains = clearRows(domains)
 			domains = clearCols(domains)
 			domains = clearSquares(domains)
@@ -336,7 +337,8 @@ function solve(){
 	//start at all values between 1 and 9. Domains will be 
 	//restricted later
 	let domains = []
-	let counter = 3
+	let counter = 1000
+	let prevMasked = maskedPuzzle
 
 	for(let i = 0; i < 81; i++){
 
@@ -353,14 +355,22 @@ function solve(){
 	domains = clearRows(domains)
 	domains = clearCols(domains)
 	domains = clearSquares(domains)
+	domains = checkForSinglePositionForValue(domains)
 
 	while(!allSingleDomains(domains) && counter > 0){	
 
 		domains = fillNewCells(domains)
+		if(maskedPuzzle == prevMasked){
+
+			domains = checkPathConsistency(domains)
+		}
+		prevMasked = maskedPuzzle
 		counter --
 	}
+	
+	fillNewCells(domains)
 
-	//console.log(counter)
+	console.log(counter)
 
 	/*
 	
